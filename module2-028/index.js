@@ -1,37 +1,73 @@
 
-// const form = document.querySelector("form")
+const form = document.querySelector("form")
 const input = document.querySelector("input")
 const button = document.querySelector("button");
 const todoList = document.querySelector(".todoList");
 
 
-// click on the button
-button.addEventListener("click", function(event) {
-    
-    // Because our form is submitting by default and reloading the page, we add preventDefault function to stop it from doing that.
-    event.preventDefault();
 
-    // get the input value
+form.addEventListener("submit", function(event) {
+    
+    
     let inputValue = input.value;
 
-    // Validate input to make sure it's not empty
     if (inputValue == '') {
         alert("Please type something...")
         return
     }
 
+    addTodo(inputValue);
+});
+
+document.addEventListener("DOMContentLoaded", fetchTodos);
+
+function fetchTodos(){
+ axios.get("https://jsonplaceholder.typicode.com/todos")
+ .then(response => {
+    //  get todos from response
+     let allTodos = response.data;
+
     // structure your output or the item to be appended inside the todolist
-    let outPut =  document.createElement("div");
+    let output = '';
 
-    // give the div a class of todoItem
-    outPut.classList ="todoItem";
+    // loop through the array of todos
+    allTodos.forEach(todo => {
+        output += `<div class="todoItem"> 
+        ${todo.title}
+        </div>`;
+    });
 
-    // set the value of this div to whatever value the input is
-    outPut.innerHTML = inputValue
 
     // Append the div to our todo list
-    todoList.appendChild(outPut);
+    todoList.innerHTML = output;
 
-    // clear the input field
+     console.log(allTodos);
+ }).catch(err => console.log(err))
+}
+
+function addTodo(todo){
+
+    let data = {
+        id: 210 + Math.floor(Math.random() * 2000),
+        title: todo,
+        completed: false,
+        userId: 212 + Math.floor(Math.random() * 2000)
+    }
+
+ axios.post("https://jsonplaceholder.typicode.com/todos", data)
+ .then(response => {
+   
+     let singleTodo = response.data;
+
+     let div =  document.createElement("div");
+
+    div.classList ="todoItem";
+
+    div.innerHTML = singleTodo.title
+
+    todoList.prepend(div);
+
     document.querySelector("input").value = "";
-});
+
+ }).catch(err => console.log(err))
+}
